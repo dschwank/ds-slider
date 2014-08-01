@@ -1,2 +1,2 @@
-ng-slider
+ds-slider
 =========
