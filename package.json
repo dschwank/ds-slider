@@ -1,0 +1,48 @@
+{
+    "name": "ds-slider",
+    "version": "0.0.1",
+    "description": "Angular slider module without any external dependencies.",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "---"
+    },
+    "keywords": [
+        "angularjs",
+        "angular",
+        "slider",
+        "range",
+        "ng",
+        "ds"
+    ],
+    "author": [
+        "Dominik Schwank <Dominik@Schwank.cc>"
+    ],
+    "license": "MIT",
+    "bugs": {
+        "url": "---"
+    },
+    "homepage": "---",
+    "dependencies": {
+        "karma": "^0.12.3"
+    },
+    "devDependencies": {
+        "gulp": "~3.2.2",
+        "gulp-clean": "~0.2.4",
+        "gulp-concat": "^2.2.0",
+        "gulp-filter": "~0.3.1",
+        "gulp-grunt": "~0.4.0",
+        "gulp-minify-css": "~0.3.0",
+        "gulp-minify-html": "^0.1.3",
+        "gulp-ng-html2js": "^0.1.6",
+        "gulp-ngmin": "~0.1.2",
+        "gulp-remove-use-strict": "0.0.2",
+        "gulp-uglify": "~0.2.1",
+        "gulp-useref": "~0.2.2",
+        "karma-jasmine": "^0.1.5",
+        "karma-ng-html2js-preprocessor": "^0.1.0",
+        "karma-phantomjs-launcher": "^0.1.4"
+    }
+}

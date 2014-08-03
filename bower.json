@@ -1,0 +1,31 @@
+{
+    "name": "ds-slider",
+    "version": "0.0.1",
+    "homepage": "http://angularjs.de",
+    "authors": [
+        "Dominik Schwank <Dominik@Schwank.cc>"
+    ],
+    "description": "Angular slider module without any external dependencies.",
+    "keywords": [
+        "angularjs",
+        "angular",
+        "slider",
+        "range",
+        "ng",
+        "ds"
+    ],
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "angular": "~1.2.19"
+    },
+    "devDependencies": {
+        "angular-mocks": "~1.2.19"
+    }
+}

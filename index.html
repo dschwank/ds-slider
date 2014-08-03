@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html ng-app="ds.slider">
+<head>
+    <title></title>
+    <link rel="stylesheet" href="src/styles/dsSlider.css"/>
+</head>
+<body ng-init="test={min: 0, max: 86400000}">
+
+<h1>dsSlider example</h1>
+
+<!-- Example Usage -->
+<div ds-slider min="0" max="144" step="1" ng-model="test"></div>
+Test: {{test.min * 600000 | date:'HH:mm'}} - {{test.max * 600000 | date:'HH:mm'}}
+
+<!-- Vendor -->
+<script src="bower_components/angular/angular.js"></script>
+
+<script src="src/scripts/module.js"></script>
+
+<script src="src/scripts/directives/dsSlider.js"></script>
+<script src="src/scripts/services/dsSliderService.js"></script>
+
+</body>
+</html>
