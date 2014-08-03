@@ -1,0 +1,54 @@
+.dsSlider {
+    display: inline-block;
+    vertical-align: middle
+}
+
+.slideBar {
+    width: 100%;
+    background-color: #48c2e9;
+    height: .3em;
+    z-index: 1;
+    padding: 0;
+    margin-left: -4px
+}
+
+.maxSlider, .minSlider {
+    background-color: gray;
+    width: 1em;
+    height: 1em;
+    z-index: 2;
+    margin-left: -4px;
+    border-radius: 4px
+}
+
+.dsSlider.positioner {
+    position: relative
+}
+
+.dsSlider.container {
+    width: 50%;
+    border: 1px solid #dcdcdc;
+    box-shadow: 1px 1px 3px #dcdcdc;
+    border-radius: 5px;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-left: 10px;
+    padding-right: 34px;
+    padding-bottom: 3px
+}
+
+.background {
+    width: 100%;
+    position: relative;
+    padding-right: 15px
+}
+
+.dsSlider.slideBar.background {
+    z-index: -1;
+    position: absolute;
+    overflow: hidden;
+    margin-top: 11px;
+    height: 0;
+    background-color: #fff;
+    border-top: 2px dashed #dfdfdf
+}
