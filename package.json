@@ -1,6 +1,6 @@
 {
     "name": "ds-slider",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Angular slider module without any external dependencies.",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
