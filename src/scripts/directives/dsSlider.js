@@ -16,14 +16,12 @@ angular.module('ds.slider')
 
                 var mElements = {}, mStart = {left: 0, width: 100};
 
-                var WIDTH_DELTA = -44; // .tsiSlider.container { padding-left: 10px; padding-right: 34px; } => -44px
-
                 function findElement(parentElement, classTag) {
                     return angular.element(parentElement.querySelector(classTag));
                 }
 
                 function determineTotalWidth() {
-                    return $element[0].clientWidth + WIDTH_DELTA;
+                    return $element[0].clientWidth - 36;
                 }
 
 

@@ -6,23 +6,26 @@
 .slideBar {
     width: 100%;
     background-color: #48c2e9;
-    height: .3em;
+    height: 4px;
     z-index: 1;
     padding: 0;
-    margin-left: -4px
+    position: relative;
+    right: 0
 }
 
 .maxSlider, .minSlider {
     background-color: gray;
-    width: 1em;
-    height: 1em;
+    width: 15px;
+    height: 15px;
     z-index: 2;
-    margin-left: -4px;
-    border-radius: 4px
+    border-radius: 4px;
+    position: relative
 }
 
 .dsSlider.positioner {
-    position: relative
+    position: relative;
+    font-size: 0;
+    float: left
 }
 
 .dsSlider.container {
@@ -32,23 +35,21 @@
     border-radius: 5px;
     overflow: hidden;
     white-space: nowrap;
-    padding-left: 10px;
-    padding-right: 34px;
-    padding-bottom: 3px
+    padding: 3px 33px 3px 3px;
+    box-sizing: border-box
 }
 
 .background {
     width: 100%;
-    position: relative;
-    padding-right: 15px
+    float: left
 }
 
 .dsSlider.slideBar.background {
     z-index: -1;
-    position: absolute;
+    position: relative;
     overflow: hidden;
-    margin-top: 11px;
-    height: 0;
+    top: 10px;
+    height: 2px;
     background-color: #fff;
     border-top: 2px dashed #dfdfdf
 }
