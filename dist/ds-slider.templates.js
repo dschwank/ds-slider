@@ -6,6 +6,6 @@
     }
     module.run(['$templateCache', function ($templateCache) {
         $templateCache.put('src/templates/dsSlider.tpl.html',
-            '<div class="dsSlider container"><div class="dsSlider positioner"><div class="dsSlider minSlider"></div><div class="dsSlider slideBar"></div><div class="dsSlider maxSlider"></div></div></div>');
+            '<div class="dsSlider"><div class="positioner"><span class="sliderText" ng-if="showShortInfo && (data.maxPer - data.minPer <= 5)">{{data.min}} - {{data.max}}</span><div class="minSlider"><span class="sliderText" ng-if="showShortInfo && (data.maxPer - data.minPer > 5)">{{data.min}}</span></div><div class="slideBar"></div><div class="maxSlider"><span class="sliderText" ng-if="showShortInfo && (data.maxPer - data.minPer > 5)">{{data.max}}</span></div></div></div>');
     }]);
 })();

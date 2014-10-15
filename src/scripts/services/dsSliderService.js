@@ -33,6 +33,25 @@ angular.module('ds.slider')
             }
         }
 
+        function Slider() {
+            var that = this instanceof Slider ? this : Object.create(Slider.prototype);
+
+            that.startX = 0;
+            that.width = 0;
+            that.left = 0;
+            that.totalWidth = 0;
+            that.startVal = 0;
+            that.min = 0;
+            that.max = 0;
+            that.multiplier = 0;
+
+            return that;
+        }
+
+        Slider.prototype.getMultiplier = function (scope) {
+            return ((scope.max - scope.min) / 100) / scope.step;
+        };
+
         return {
             calculatePer: function (type, startVal, delta, minPer, maxPer) {
                 return calculatePer(type, startVal, delta, minPer, maxPer);
@@ -44,6 +63,10 @@ angular.module('ds.slider')
 
             updateCSSPosition: function (positionerElement, type, startLeft, startWidth, newVal) {
                 updateCSSPosition(positionerElement, type, startLeft, startWidth, newVal);
+            },
+
+            initSliderObj: function () {
+                return new Slider();
             }
         };
     });

@@ -1,55 +1,55 @@
-.dsSlider {
-    display: inline-block;
-    vertical-align: middle
+.dsSlider * {
+    vertical-align: middle;
+    display: inline-block
 }
 
-.slideBar {
+.dsSlider {
+    vertical-align: middle;
+    display: inline-block;
+    width: 50%;
+    border: 1px solid #dcdcdc;
+    box-shadow: 1px 1px 3px #dcdcdc;
+    border-radius: 5px;
+    white-space: nowrap;
+    padding: 3px 33px 3px 3px;
+    box-sizing: border-box
+}
+
+.dsSlider .slideBar {
     width: 100%;
     background-color: #48c2e9;
     height: 4px;
     z-index: 1;
     padding: 0;
     position: relative;
-    right: 0
+    right: 0;
+    text-align: center
 }
 
-.maxSlider, .minSlider {
+.dsSlider .maxSlider, .dsSlider .minSlider {
     background-color: gray;
     width: 15px;
     height: 15px;
     z-index: 2;
     border-radius: 4px;
-    position: relative
+    position: relative;
+    cursor: pointer
 }
 
-.dsSlider.positioner {
+.dsSlider .positioner {
     position: relative;
     font-size: 0;
     float: left
 }
 
-.dsSlider.container {
-    width: 50%;
-    border: 1px solid #dcdcdc;
-    box-shadow: 1px 1px 3px #dcdcdc;
-    border-radius: 5px;
-    overflow: hidden;
-    white-space: nowrap;
-    padding: 3px 33px 3px 3px;
-    box-sizing: border-box
+.dsSlider .sliderText {
+    position: absolute;
+    font-size: 12px;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    top: -1.5em
 }
 
-.background {
-    width: 100%;
-    float: left
-}
-
-.dsSlider.slideBar.background {
-    z-index: -1;
-    position: relative;
-    overflow: hidden;
-    top: 10px;
-    height: 2px;
-    background-color: #fff;
-    border-top: 2px dashed #dfdfdf
+.dsSlider .slideBar .sliderText {
+    left: -7.5px
 }

@@ -4,13 +4,13 @@
     <title></title>
     <link rel="stylesheet" href="src/styles/dsSlider.css"/>
 </head>
-<body ng-init="test={min: 0, max: 144}">
+<body ng-init="test={min: 57, max: 222}">
 
 <h1>dsSlider example</h1>
 
 <!-- Example Usage -->
-<div ds-slider min="0" max="144" step="1" ng-model="test"></div>
-Test: {{test.min * 600000 | date:'HH:mm'}} - {{test.max * 600000 | date:'HH:mm'}}
+<div ds-slider min="46" max="345" step="1" ng-model="test" call-broadcast="true"></div>
+Test: {{test.min}} - {{test.max}}
 
 <!-- Vendor -->
 <script src="bower_components/angular/angular.js"></script>
