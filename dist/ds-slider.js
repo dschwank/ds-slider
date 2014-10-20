@@ -116,6 +116,9 @@ angular.module('ds.slider').directive('dsSlider', [
 
                 function reformat(type) {
                     if (type) {
+                        if (type === 'min' && !mStart.left) {
+                            mStart.left = scope.data[type + 'Per'];
+                        }
                         dsSliderService.updateCSSPosition(mElements.positioner, type, mStart.left, mStart.width, scope.data[type + 'Per']);
                     } else {
                         reformat('min');
