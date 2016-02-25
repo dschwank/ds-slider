@@ -1,6 +1,6 @@
 {
   "name": "ds-slider",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "homepage": "https://github.com/dschwank",
   "authors": [
     "Dominik Schwank <Github@Schwank.cc>"
@@ -15,15 +15,24 @@
     "ds"
   ],
   "license": "MIT",
+  "main": [
+    "./dist/ds-slider.min.js",
+    "./dist/ds-slider.templates.min.js",
+    "./dist/css/styles.min.css"
+  ],
   "ignore": [
     "**/.*",
     "node_modules",
     "bower_components",
+    "src",
+    "package.json",
+    "karma.conf.js",
+    "index.html",
+    "Gulpfile.js",
     "test",
     "tests"
   ],
   "dependencies": {
-    "jquery": "^2.2.1",
     "angular": "~1.5"
   },
   "devDependencies": {
