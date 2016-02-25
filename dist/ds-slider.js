@@ -1,208 +1,245 @@
-"use strict";
+(function() {
+  'use strict';
 
-angular.module('ds.slider', []);
+  angular.module('ds.slider', []);
+}());
+
 "use strict";
 
 angular.module('ds.slider')
-    .directive('dsSlider', ["$document", "$log", "dsSliderService", function ($document, $log, dsSliderService) {
-        return {
-            restrict: 'EA',
-            replace: true,
-            require: '^ngModel',
-            scope: {
-                min: '@',
-                max: '@',
-                step: '@?',
-                data: '=?ngModel'
-            },
-            link: function (scope, element, attrs, ngModel) {
+    .directive('dsSlider', ["$document", "$log", "dsSliderService", function($document, $log, dsSliderService) {
+      return {
+        restrict: 'EA',
+        replace: true,
+        require: '^ngModel',
+        scope: {
+          minBorder: '@min',
+          maxBorder: '@max',
+          step: '@?'
+        },
+        link: function(scope, element, attrs, ngModel) {
 
-                var mElements = {},
-                    mStart = {
-                        left: 0,
-                        width: 100
-                    },
-                    mUpdateThrottle = attrs.updateThrottle || 20,
-                    mBroadcastEnabled = attrs.enableBroadcast,
-                    mApplyEnabled = attrs.enableApply,
-                    mUpdateThrottleTimeout;
+          var mConfig = {
+                elements: {},
+                start: {},
+                data: {},
+                throttle: attrs.updateThrottle || 50
+              },
+              mUpdateThrottleTimeout;
 
-                function findElement(parentElement, classTag) {
-                    return angular.element(parentElement.querySelector(classTag));
-                }
+          function mouseMove(type) {
+            return function(event) {
+              var tEvent;
 
-                function determineTotalWidth() {
-                    return element[0].clientWidth - 36;
-                }
+              tEvent = event.originalEvent || event;
 
-                function updateSlider(type, moveDelta) {
+              if (!mUpdateThrottleTimeout) {
+                mUpdateThrottleTimeout = setTimeout(function() {
+                  var tModelValue;
 
-                    var tVal;
+                  dsSliderService.sliderMovedTo(mConfig, type, tEvent.clientX);
 
-                    // calculate the percentage value
-                    tVal = Math.ceil((dsSliderService.calculatePer(type, mStart, moveDelta, parseFloat(scope.min), parseFloat(scope.max))));
+                  tModelValue = dsSliderService.prepareModelValue(mConfig);
 
-                    scope.data[type] = tVal;
+                  ngModel.$setViewValue(tModelValue);
+                  mUpdateThrottleTimeout = undefined;
+                }, mConfig.throttle);
+              }
 
-                    scope.data[type + 'Per'] = (tVal - parseFloat(scope.min)) / mStart.multiplier * 100;
-                    if (mBroadcastEnabled) {
-                        scope.$broadcast('dsSliderChange', scope.data);
-                        scope.$digest();
-                    } else {
-                        scope.$apply();
-                    }
+              tEvent.preventDefault();
+            };
+          }
 
-                    // finally reformat the slider
-                    reformat(type);
-                }
+          function mouseUp(moveEvent) {
+            var handler = function(event) {
+              var tEvent = event.originalEvent || event;
 
-                function mouseMove(type) {
-                    return function (event) {
-                        // throttle the update calls by the given value of mUpdateThrottle
+              tEvent.preventDefault();
+              $document.off('mousemove', moveEvent);
+              $document.off('mouseup', handler);
+            };
 
-                        var tEvent = event.originalEvent || event;
+            return handler;
+          }
 
-                        if (!mUpdateThrottleTimeout) {
-                            mUpdateThrottleTimeout = setTimeout(function () {
-                                updateSlider(type, (tEvent.clientX - mStart.x) * mStart.perPx);
-                                mUpdateThrottleTimeout = undefined;
-                            }, mUpdateThrottle);
-                        }
-                        tEvent.preventDefault();
+          function mouseDown(type) {
+            return function(event) {
+              var tMoveFn;
 
-                    };
-                }
+              dsSliderService.startSlide(mConfig, event);
 
-                function mouseUp(moveEvent) {
-                    var handler = function (event) {
-                        var tEvent = event.originalEvent || event;
+              tMoveFn = mouseMove(type);
 
-                        tEvent.preventDefault();
-                        $document.unbind('mousemove', moveEvent);
-                        $document.unbind('mouseup', handler);
-                        // $log.info('min: ' + scope.data.min + ', max: ' + scope.data.max);
-                    };
+              $document.on('mousemove', tMoveFn);
+              $document.on('mouseup', mouseUp(tMoveFn));
+            };
+          }
 
-                    return handler;
-                }
+          ngModel.$render = function() {
+            $log.debug('RENDER');
+            mConfig.data.min = parseFloat(ngModel.$viewValue.min);
+            mConfig.data.max = parseFloat(ngModel.$viewValue.max);
 
-                function startSlide(event, maxVal) {
+            dsSliderService.startSlide(mConfig);
 
-                    var tEvent = event.originalEvent || event;
+            dsSliderService.sliderMovedBy(mConfig, 'min');
+            dsSliderService.sliderMovedBy(mConfig, 'max');
+          };
 
-                    mStart.x = tEvent.clientX; // startPosition of the move
-                    mStart.totalWidth = determineTotalWidth();
-                    mStart.min = scope.data.min;
-                    mStart.minPer = scope.data.minPer;
-                    mStart.max = scope.data.max;
-                    mStart.maxPer = scope.data.maxPer;
-                    mStart.step = scope.step;
-                    mStart.multiplier = scope.max - scope.min;
-                    mStart.perPx = (scope.max - scope.min) / (mStart.totalWidth);
+          scope.$watchGroup(['minBorder', 'maxBorder', 'step'], function(values) {
+            mConfig.data.minBorder = parseFloat(values[0]);
+            mConfig.data.maxBorder = parseFloat(values[1]);
+            mConfig.data.step = angular.isDefined(values[2]) ? parseFloat(values[2]) : 0;
 
-                    tEvent.preventDefault();
-                }
+            dsSliderService.startSlide(mConfig);
+            dsSliderService.sliderMovedBy(mConfig, 'min');
+            dsSliderService.sliderMovedBy(mConfig, 'max');
+          });
 
-                function mouseDown(scopeVar) {
-                    return function (event) {
-                        startSlide(event, scopeVar === 'max');
-                        var tMoveFn = mouseMove(scopeVar);
-                        $document.on('mousemove', tMoveFn);
-                        $document.on('mouseup', mouseUp(tMoveFn));
-                    };
-                }
+          (function initElements() {
+            mConfig.elements = dsSliderService.findElements(element);
 
-                function findSlideElements() {
-                    mElements = {
-                        min: findElement(element[0], '.minSlider'),
-                        positioner: findElement(element[0], '.positioner'),
-                        max: findElement(element[0], '.maxSlider')
-                    };
-                }
+            mConfig.elements.min.on('mousedown', mouseDown('min'));
 
-                function initScopeValues() {
-                    // should already be set
-                    // $scope.min = $scope.min || 0;
-                    // $scope.max = $scope.max || 100;
+            mConfig.elements.max.on('mousedown', mouseDown('max'));
 
-                    // init default values
-                    scope.step = scope.step || 1;
-                    scope.data = scope.data || {
-                            min: scope.min,
-                            max: scope.max
-                        };
+            dsSliderService.startSlide(mConfig);
+          }());
 
-                    // init percentage values
-                    scope.data.minPer = ((scope.data.min - scope.min) / (scope.max - scope.min) * 100);
-                    scope.data.maxPer = ((scope.data.max - scope.min) / (scope.max - scope.min) * 100);
-
-                    scope.showShortInfo = attrs.enableShortInfo;
-                }
-
-                function reformat(type) {
-                    if (type) {
-                        dsSliderService.updateCSSPosition(mElements.positioner, type, scope.data);
-                    } else {
-                        reformat('min');
-                        reformat('max');
-                    }
-                }
-
-                function initElements() {
-                    mElements.min.on('mousedown', mouseDown('min'));
-
-                    mElements.max.on('mousedown', mouseDown('max'));
-
-                    reformat();
-                }
-
-                (function init() {
-
-                    initScopeValues();
-
-                    findSlideElements();
-                    initElements();
-
-                }());
-
-            },
-            templateUrl: 'src/templates/dsSlider.tpl.html'
-        };
+        },
+        templateUrl: 'src/templates/dsSlider.tpl.html'
+      };
     }]);
-"use strict";
+(function() {
+  'use strict';
 
-angular.module('ds.slider')
-    .factory('dsSliderService', function () {
+  angular.module('ds.slider')
+      .factory('dsSliderService', function() {
 
-        function calculatePer(type, start, delta, min, max) {
-            var tPercentage = start[type] + delta;
+        var mPublicApi;
 
-            tPercentage = tPercentage - (tPercentage % start.step);
-
-            // correct the percentage value‚
-            if (type === 'max') {
-                tPercentage = tPercentage < start.min ? start.min : tPercentage > max ? max : tPercentage;
-            } else {
-                tPercentage = tPercentage < min ? min : tPercentage > start.max ? start.max : tPercentage;
-            }
-
-            return tPercentage;
-        }
-
-        function updateCSSPosition(positionerElement, type, start) {
-            positionerElement.css({
-                width: (start['maxPer'] - start['minPer']) + '%',
-                left: start['minPer'] + '%'
-            });
-        }
-
-        return {
-            calculatePer: function (type, startVal, delta, minPer, maxPer) {
-                return calculatePer(type, startVal, delta, minPer, maxPer);
-            },
-
-            updateCSSPosition: function (positionerElement, type, start) {
-                updateCSSPosition(positionerElement, type, start);
-            }
+        mPublicApi = {
+          changeValue: changeValue,
+          determineTotalWidth: determineTotalWidth,
+          findElements: findElements,
+          prepareModelValue: prepareModelValue,
+          sliderMovedBy: sliderMovedBy,
+          sliderMovedTo: sliderMovedTo,
+          startSlide: startSlide,
+          updateCSS: updateCSS
         };
-    });
+
+        return mPublicApi;
+
+        /* ##################
+         * ### PUBLIC API ###
+         * ##################
+         */
+
+        function prepareModelValue(config) {
+
+          var tValue;
+
+          tValue = {
+            min: _fixValue(config.data.min, config.data.step),
+            max: _fixValue(config.data.max, config.data.step)
+          };
+
+          return tValue;
+        }
+
+        function _fixValue(value, step) {
+          var tValue = value;
+
+          if (angular.isNumber(step)) {
+            tValue = value - (value % step);
+          }
+
+          return tValue;
+        }
+
+        function sliderMovedTo(config, type, xPosition) {
+          sliderMovedBy(config, type, (xPosition - config.start.x) * config.start.perPx);
+        }
+
+        function sliderMovedBy(config, type, by) {
+          var tChangedValue;
+
+          tChangedValue = changeValue(config, type, by);
+          config.data[type] = tChangedValue;
+
+          config.data[type + 'Per'] =
+              (tChangedValue - config.data.minBorder) / config.start.range * 100;
+
+          updateCSS(config.elements.positioner, config.data);
+        }
+
+        function startSlide(config, event) {
+          var tEvent;
+
+          tEvent = angular.isObject(event) ? (event.originalEvent || event) : {};
+
+          config.start.x = tEvent.clientX;
+          config.start.totalWidth = determineTotalWidth(config.elements.parent);
+          config.start.min = config.data.min;
+          config.start.max = config.data.max;
+          config.start.range = config.data.maxBorder - config.data.minBorder;
+          config.start.perPx = (config.start.range) / (config.start.totalWidth);
+        }
+
+        function determineTotalWidth(parent) {
+          return parent[0].clientWidth - 36;
+        }
+
+        function findElements(parent) {
+          var tElements;
+
+          tElements = {
+            parent: parent,
+            min: _findElement(parent[0], '.minSlider'),
+            positioner: _findElement(parent[0], '.positioner'),
+            max: _findElement(parent[0], '.maxSlider')
+          };
+
+          return tElements;
+        }
+
+        function changeValue(config, type, by) {
+          var tValue,
+              tLowerBorder,
+              tUpperBorder;
+
+          if (type === 'max') {
+            tLowerBorder = config.start.min;
+            tUpperBorder = config.data.maxBorder;
+          } else {
+            tLowerBorder = config.data.minBorder;
+            tUpperBorder = config.start.max;
+          }
+
+          tValue = config.start[type] + (by || 0);
+
+          tValue = tValue < tLowerBorder ? tLowerBorder :
+                   tValue > tUpperBorder ? tUpperBorder : tValue;
+
+          return tValue;
+        }
+
+        function updateCSS(positioner, data) {
+          console.log('UPDATE CSS', data);
+          positioner.css({
+            width: (data.maxPer - data.minPer) + '%',
+            left: data.minPer + '%'
+          });
+        }
+
+        /* ######################
+         * ### HELPER METHODS ###
+         * ###################### */
+
+        function _findElement(parent, selector) {
+          return angular.element(parent.querySelector(selector));
+        }
+      });
+
+}());

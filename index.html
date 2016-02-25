@@ -4,20 +4,20 @@
     <title></title>
     <link rel="stylesheet" href="src/styles/dsSlider.css"/>
 </head>
-<body ng-init="test={min: 60, max: 281}">
+<body ng-init="test={min: 10, max: 50}">
 
 <h1>dsSlider example</h1>
 
 <!-- Example Usage -->
 <div style="width:300px">
-    <div ds-slider min="0" max="3600000" step="60000" ng-model="test" call-broadcast="true"></div>
-    Test: {{test.min}} - {{test.max}}
+    <div ds-slider min="0" max="3600000" step="60000" ng-model="test"></div>
+    <span>Test: {{test.min}} - {{test.max}}</span>
 </div>
 
 <!-- Vendor -->
 <script src="bower_components/angular/angular.js"></script>
 
-<script src="src/scripts/module.js"></script>
+<script src="src/scripts/app.js"></script>
 
 <script src="src/scripts/directives/dsSlider.js"></script>
 <script src="src/scripts/services/dsSliderService.js"></script>
