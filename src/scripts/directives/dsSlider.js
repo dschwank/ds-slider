@@ -34,11 +34,14 @@ angular.module('ds.slider')
 
                 function updateSlider(type, moveDelta) {
 
-                    // calculate the percentage value
-                    scope.data[type + 'Per'] = dsSliderService.calculatePer(type, mStart.startVal, moveDelta, mStart.min, mStart.max);
+                    var tVal;
 
-                    // calculate the _real_ value
-                    scope.data[type] = dsSliderService.calculateVal(parseFloat(scope.min), mStart.multiplier, scope.step, scope.data[type + 'Per']);
+                    // calculate the percentage value
+                    tVal = Math.ceil((dsSliderService.calculatePer(type, mStart, moveDelta, parseFloat(scope.min), parseFloat(scope.max))));
+
+                    scope.data[type] = tVal;
+
+                    scope.data[type + 'Per'] = (tVal - parseFloat(scope.min)) / mStart.multiplier * 100;
                     if (mBroadcastEnabled) {
                         scope.$broadcast('dsSliderChange', scope.data);
                         scope.$digest();
@@ -54,20 +57,24 @@ angular.module('ds.slider')
                     return function (event) {
                         // throttle the update calls by the given value of mUpdateThrottle
 
+                        var tEvent = event.originalEvent || event;
+
                         if (!mUpdateThrottleTimeout) {
                             mUpdateThrottleTimeout = setTimeout(function () {
-                                updateSlider(type, (event.clientX - mStart.x) / mStart.totalWidth);
+                                updateSlider(type, (tEvent.clientX - mStart.x) * mStart.perPx);
                                 mUpdateThrottleTimeout = undefined;
                             }, mUpdateThrottle);
                         }
-                        event.preventDefault();
+                        tEvent.preventDefault();
 
                     };
                 }
 
                 function mouseUp(moveEvent) {
                     var handler = function (event) {
-                        event.preventDefault();
+                        var tEvent = event.originalEvent || event;
+
+                        tEvent.preventDefault();
                         $document.unbind('mousemove', moveEvent);
                         $document.unbind('mouseup', handler);
                         // $log.info('min: ' + scope.data.min + ', max: ' + scope.data.max);
@@ -78,17 +85,19 @@ angular.module('ds.slider')
 
                 function startSlide(event, maxVal) {
 
-                    mStart.x = event.clientX; // startPosition of the move
-                    mStart.width = parseFloat(mElements.positioner.css("width"));
-                    mStart.width = !mStart.width && mStart.width !== 0 ? 100 : mStart.width;
-                    mStart.left = parseFloat(mElements.positioner.css("left")) || 0;
-                    mStart.totalWidth = determineTotalWidth();
-                    mStart.startVal = maxVal ? (mStart.width + mStart.left) : mStart.left;
-                    mStart.min = maxVal ? mStart.left : 0;
-                    mStart.max = maxVal ? 100 : (mStart.width + mStart.left);
-                    mStart.multiplier = ((scope.max - scope.min) / 100) / scope.step;
+                    var tEvent = event.originalEvent || event;
 
-                    event.preventDefault();
+                    mStart.x = tEvent.clientX; // startPosition of the move
+                    mStart.totalWidth = determineTotalWidth();
+                    mStart.min = scope.data.min;
+                    mStart.minPer = scope.data.minPer;
+                    mStart.max = scope.data.max;
+                    mStart.maxPer = scope.data.maxPer;
+                    mStart.step = scope.step;
+                    mStart.multiplier = scope.max - scope.min;
+                    mStart.perPx = (scope.max - scope.min) / (mStart.totalWidth);
+
+                    tEvent.preventDefault();
                 }
 
                 function mouseDown(scopeVar) {
@@ -104,7 +113,8 @@ angular.module('ds.slider')
                     mElements = {
                         min: findElement(element[0], '.minSlider'),
                         positioner: findElement(element[0], '.positioner'),
-                        max: findElement(element[0], '.maxSlider')};
+                        max: findElement(element[0], '.maxSlider')
+                    };
                 }
 
                 function initScopeValues() {
@@ -115,23 +125,20 @@ angular.module('ds.slider')
                     // init default values
                     scope.step = scope.step || 1;
                     scope.data = scope.data || {
-                        min: scope.min,
-                        max: scope.max
-                    };
+                            min: scope.min,
+                            max: scope.max
+                        };
 
                     // init percentage values
-                    scope.data.minPer = (100 / (scope.max - scope.min)) * (scope.data.min - scope.min);
-                    scope.data.maxPer = (100 / (scope.max)) * (scope.data.max);
+                    scope.data.minPer = ((scope.data.min - scope.min) / (scope.max - scope.min) * 100);
+                    scope.data.maxPer = ((scope.data.max - scope.min) / (scope.max - scope.min) * 100);
 
                     scope.showShortInfo = attrs.enableShortInfo;
                 }
 
                 function reformat(type) {
                     if (type) {
-                        if (type === 'min' && !mStart.left) {
-                            mStart.left = scope.data[type + 'Per'];
-                        }
-                        dsSliderService.updateCSSPosition(mElements.positioner, type, mStart.left, mStart.width, scope.data[type + 'Per']);
+                        dsSliderService.updateCSSPosition(mElements.positioner, type, scope.data);
                     } else {
                         reformat('min');
                         reformat('max');
